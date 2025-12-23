@@ -1,0 +1,45 @@
+:root {
+  --sidebar-width: 220px;
+}
+.dashboard-root {
+  display: flex;
+}
+.dashboard-sidebar {
+  width: var(--sidebar-width);
+  border-right: 1px solid #e6e9ef;
+  background: white;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+.dashboard-main {
+  flex: 1;
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+}
+
+.input {
+  border: 1px solid #e6e9ef;
+  border-radius: 0.375rem; /* rounded */
+  padding: 0.5rem 0.75rem; /* py-2 px-3 */
+  width: 100%;
+  background: white;
+  color: inherit;
+}
+
+.btn {
+  background-color: #0f172a; /* slate-900 */
+  color: white;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem; /* py-2 px-4 */
+  border: none;
+  cursor: pointer;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #334155; /* slate-700 */
+  border: 1px solid #e6e9ef;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.75rem; /* py-1 px-3 */
+  cursor: pointer;
+}

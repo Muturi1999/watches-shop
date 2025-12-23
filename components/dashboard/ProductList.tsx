@@ -209,7 +209,7 @@ export default function ProductList({ initialProducts, filterCategory }: { initi
                 <td className="p-3 align-top">{p.price}</td>
                 <td className="p-3 align-top">
                   <button className="btn btn-ghost mr-2" onClick={() => openView(p)}>View</button>
-                  <Link href={`/dashboard/products/${p.id}`} className="btn btn-ghost mr-2">Open</Link>
+                  <Link href={`/admin/products/${p.id}`} className="btn btn-ghost mr-2">Open</Link>
                   <button className="btn btn-ghost mr-2" onClick={() => openEdit(p)}>Edit</button>
                   <button className="btn btn-ghost mr-2" onClick={() => deleteProduct(p.id!)}>Delete</button>
                 </td>
@@ -240,7 +240,7 @@ export default function ProductList({ initialProducts, filterCategory }: { initi
                 <div><strong>Badges:</strong> {(selected.badges || []).join(', ')}</div>
                 <div><strong>Inventory:</strong> {selected.inventory ? `${selected.inventory.stock ?? '-'} pcs (SKU: ${selected.inventory.sku ?? '-'})` : '-'}</div>
                 <div><strong>Description:</strong> {selected.description}</div>
-                <div className="mt-3"><Link href={`/dashboard/products/${selected.id}`} className="btn btn-ghost">Open detail page</Link></div>
+                <div className="mt-3"><Link href={`/admin/products/${selected.id}`} className="btn btn-ghost">Open detail page</Link></div>
               </div>
             ) : (
               <form className="modal-body space-y-3" onSubmit={submitEdit}>

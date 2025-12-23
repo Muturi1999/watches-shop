@@ -3,8 +3,9 @@ import { Footer } from "@/components/footer"
 import Image from "next/image"
 import CategoryShop from "@/components/shop/CategoryShop"
 
-export default function ShopPage({ searchParams }: { searchParams?: { category?: string } }) {
-  const category = searchParams?.category
+export default async function ShopPage({ searchParams }: { searchParams?: { category?: string } | Promise<{ category?: string }> }) {
+  const sp = await searchParams
+  const category = sp?.category
 
   return (
     <div className="min-h-screen flex flex-col">
