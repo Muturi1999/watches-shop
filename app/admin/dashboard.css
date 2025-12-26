@@ -1,5 +1,5 @@
 :root {
-  --sidebar-width: 220px;
+  --sidebar-width: 256px;
 }
 .dashboard-root {
   display: flex;
@@ -9,12 +9,47 @@
   border-right: 1px solid #e6e9ef;
   background: white;
   height: 100vh;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  z-index: 40;
+  overflow-y: auto;
+  transition: transform 0.3s ease-in-out;
 }
 .dashboard-main {
   flex: 1;
+  margin-left: var(--sidebar-width);
   background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+  min-height: 100vh;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+  .dashboard-sidebar {
+    transform: translateX(-100%);
+  }
+  .dashboard-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .dashboard-main {
+    margin-left: 0;
+  }
+}
+
+/* Mobile overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 30;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-overlay.active {
+    display: block;
+  }
 }
 
 .input {
