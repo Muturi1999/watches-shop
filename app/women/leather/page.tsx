@@ -22,7 +22,7 @@ const products = [
   { id: 43, name: "White Leather Strap Watch", price: 8500, category: "Watches", brand: "Omega", size: "34mm", limited: false, image: "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400&q=80" },
   { id: 44, name: "Brown Leather Classic Watch", price: 8900, category: "Watches", brand: "TAG Heuer", size: "36mm", limited: false, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?w=400&q=80" },
   { id: 45, name: "Beige Leather Elegant Watch", price: 8300, category: "Watches", brand: "Patek Philippe", size: "32mm", limited: true, image: "https://images.unsplash.com/photo-1539874754764-5a96559165b0?w=400&q=80" },
-  { id: 46, name: "Black Steel Luxury Watch", price: 9000, category: "Watches", brand: "Rolex", size: "34mm", limited: false, image: "https://images.unsplash.com/photo-1606390493515-2f813f7ec13e?w=400&q=80" },
+  { id: 46, name: "Black Steel Luxury Watch", price: 9000, category: "Watches", brand: "Rolex", size: "34mm", limited: false, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
   { id: 47, name: "Galaxy Smart Watch Rose", price: 4500, category: "Smart Watches", brand: "Samsung", size: "42mm", limited: false, image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400&q=80" },
   { id: 48, name: "Huawei GT Elegant Watch", price: 3800, category: "Smart Watches", brand: "Huawei", size: "42mm", limited: false, image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=400&q=80" },
   { id: 49, name: "Gold Chain Bracelet", price: 5200, category: "Bracelets", brand: "Cartier", size: "Medium", limited: false, image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=80" },

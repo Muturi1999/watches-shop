@@ -29,7 +29,7 @@ export default function WomenMetallic() {
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {products.map((product) => (
-            <Link key={product.id} href={`/product/${product.id}`}>
+            <Link key={product.id} href={`/product/${product.id}?from=women`}>
               <Card className="group overflow-hidden cursor-pointer transition-all hover:shadow-xl">
                 <div className="relative aspect-square overflow-hidden bg-muted">
                   <Image

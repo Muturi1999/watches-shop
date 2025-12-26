@@ -225,7 +225,7 @@ export default function Home() {
               { name: "Neptune Black Canvas", img: "https://images.unsplash.com/photo-1525857597365-5f6dbff2e36e?w=400&q=80" },
               { name: "Aquila Black", img: "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=400&q=80" },
               { name: "Aquila Burgundy", img: "https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=400&q=80" },
-              { name: "Aquila Gold Mesh", img: "https://images.unsplash.com/photo-1606390493515-2f813f7ec13e?w=400&q=80" },
+              { name: "Aquila Gold Mesh", img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
               { name: "Aurora Black", img: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400&q=80" },
             ].map((watch, index) => (
               <Link key={index} href={`/product/${index + 5}?from=collection`}>
