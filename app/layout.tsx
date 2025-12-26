@@ -9,26 +9,19 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Chesiro Collection - Premium Executive Watches & Accessories",
+  title: "City Watches - Premium Executive Watches & Accessories",
   description:
-    "Premium Kenyan brand providing executive watches, jewelry, and accessories for both men and women. Original watches with 1 year warranty and free lifetime battery replacement.",
+    "Premium brand providing executive watches for both men and women. City Watches offers the finest collection of luxury timepieces from around the world. Original watches with 1 year warranty and free lifetime battery replacement.",
   generator: "v0.app",
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
+        url: "/favicon.svg",
         type: "image/svg+xml",
       },
     ],
-    apple: "/apple-icon.png",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 }
 

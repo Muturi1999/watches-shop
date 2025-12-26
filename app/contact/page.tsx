@@ -64,8 +64,8 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-2">Phone</h3>
-                  <p className="text-muted-foreground">WhatsApp: +254 XXX XXX XXX</p>
-                  <p className="text-muted-foreground">Call: +254 XXX XXX XXX</p>
+                  <p className="text-muted-foreground">WhatsApp: +254 728 160 293</p>
+                  <p className="text-muted-foreground">Call: 0728160293</p>
                 </div>
               </div>
             </Card>

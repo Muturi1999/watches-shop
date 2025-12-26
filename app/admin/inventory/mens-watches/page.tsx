@@ -5,11 +5,11 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Plus, Edit, Trash2, Search, Filter, Package } from 'lucide-react'
+import { Plus, Edit, Trash2, Search, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Image from 'next/image'
-import { products as seedProducts } from '@/lib/products'
 
 interface Product {
   id: number
@@ -27,25 +27,21 @@ interface Product {
   warranty?: string
   stock: number
   sku?: string
-  categoryId?: string
-  brandId?: string
   createdAt: string
 }
 
-export default function ProductsPage() {
+export default function MensWatchesPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<any[]>([])
   const [brands, setBrands] = useState<any[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterCategory, setFilterCategory] = useState('')
   const [filterBrand, setFilterBrand] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
   const [formData, setFormData] = useState({
     name: '',
     priceNum: 0,
-    category: '',
     brand: '',
     size: '',
     image: '',
@@ -55,75 +51,41 @@ export default function ProductsPage() {
     waterResistance: '',
     warranty: '',
     stock: 0,
-    sku: '',
-    categoryId: '',
-    brandId: ''
+    sku: ''
   })
   const { toast } = useToast()
 
   useEffect(() => {
     loadProducts()
+    loadBrands()
   }, [])
 
   useEffect(() => {
-    // Load categories and brands after products are loaded
-    if (products.length > 0) {
-      loadCategories()
-      loadBrands()
-    }
-  }, [products])
-
-  useEffect(() => {
     filterProducts()
-  }, [products, searchTerm, filterCategory, filterBrand])
+  }, [products, searchTerm, filterBrand])
 
   const loadProducts = () => {
-    const stored = localStorage.getItem('admin_products')
-    if (stored) {
-      setProducts(JSON.parse(stored))
-    } else {
-      // Initialize with seed data
-      const initialProducts = seedProducts.map(p => ({
-        ...p,
-        stock: 10,
-        sku: `SKU-${p.id}`,
-        createdAt: new Date().toISOString()
-      }))
-      localStorage.setItem('admin_products', JSON.stringify(initialProducts))
-      setProducts(initialProducts)
-    }
-  }
-
-  const loadCategories = () => {
-    const stored = localStorage.getItem('admin_categories')
-    if (stored) {
-      setCategories(JSON.parse(stored))
-    } else {
-      // Extract unique categories from products
-      const productCategories = products.map(p => p.category).filter(Boolean)
-      const uniqueCategories = [...new Set(productCategories)].map((cat, index) => ({
-        id: index + 1,
-        name: cat,
-        slug: cat.toLowerCase().replace(/\s+/g, '-')
-      }))
-      setCategories(uniqueCategories)
+    setIsLoading(true)
+    try {
+      const stored = localStorage.getItem('admin_products')
+      if (stored) {
+        const allProducts = JSON.parse(stored)
+        const mensProducts = allProducts.filter((p: Product) => 
+          p.category.toLowerCase().includes('men') && !p.category.toLowerCase().includes('women')
+        )
+        setProducts(mensProducts)
+      }
+    } catch (error) {
+      console.error('Error loading products:', error)
+      toast({ title: 'Error loading products', variant: 'destructive' })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const loadBrands = () => {
     const stored = localStorage.getItem('admin_brands')
-    if (stored) {
-      setBrands(JSON.parse(stored))
-    } else {
-      // Extract unique brands from products
-      const productBrands = products.map(p => p.brand).filter(Boolean)
-      const uniqueBrands = [...new Set(productBrands)].map((brand, index) => ({
-        id: index + 1,
-        name: brand,
-        slug: brand.toLowerCase().replace(/\s+/g, '-')
-      }))
-      setBrands(uniqueBrands)
-    }
+    setBrands(stored ? JSON.parse(stored) : [])
   }
 
   const filterProducts = () => {
@@ -137,10 +99,6 @@ export default function ProductsPage() {
       )
     }
 
-    if (filterCategory) {
-      filtered = filtered.filter(p => p.category === filterCategory)
-    }
-
     if (filterBrand) {
       filtered = filtered.filter(p => p.brand === filterBrand)
     }
@@ -148,23 +106,35 @@ export default function ProductsPage() {
     setFilteredProducts(filtered)
   }
 
+  const syncToFrontend = (updatedProducts: Product[]) => {
+    // Update products in lib/products.ts through localStorage
+    const allProducts = JSON.parse(localStorage.getItem('admin_products') || '[]')
+    localStorage.setItem('admin_products', JSON.stringify(allProducts))
+    
+    // Dispatch event to notify frontend
+    window.dispatchEvent(new CustomEvent('productsUpdated', { detail: allProducts }))
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
     const productData = {
       ...formData,
+      category: 'Mens Watches',
       price: `KSh${formData.priceNum.toLocaleString()}`,
       features: formData.features ? formData.features.split('\n').filter(f => f.trim()) : [],
     }
 
+    const allProducts = JSON.parse(localStorage.getItem('admin_products') || '[]')
+
     if (editingProduct) {
-      const updated = products.map(p => 
+      const updated = allProducts.map((p: Product) => 
         p.id === editingProduct.id 
           ? { ...p, ...productData }
           : p
       )
-      setProducts(updated)
       localStorage.setItem('admin_products', JSON.stringify(updated))
+      syncToFrontend(updated)
       toast({ title: 'Product updated successfully' })
     } else {
       const newProduct: Product = {
@@ -172,12 +142,13 @@ export default function ProductsPage() {
         ...productData,
         createdAt: new Date().toISOString()
       }
-      const updated = [...products, newProduct]
-      setProducts(updated)
+      const updated = [...allProducts, newProduct]
       localStorage.setItem('admin_products', JSON.stringify(updated))
+      syncToFrontend(updated)
       toast({ title: 'Product created successfully' })
     }
     
+    loadProducts()
     resetForm()
   }
 
@@ -186,7 +157,6 @@ export default function ProductsPage() {
     setFormData({
       name: product.name,
       priceNum: product.priceNum,
-      category: product.category,
       brand: product.brand || '',
       size: product.size || '',
       image: product.image,
@@ -196,27 +166,39 @@ export default function ProductsPage() {
       waterResistance: product.waterResistance || '',
       warranty: product.warranty || '',
       stock: product.stock || 0,
-      sku: product.sku || '',
-      categoryId: product.categoryId || '',
-      brandId: product.brandId || ''
+      sku: product.sku || ''
     })
     setIsDialogOpen(true)
   }
 
   const handleDelete = (id: number) => {
     if (confirm('Are you sure you want to delete this product?')) {
-      const updated = products.filter(p => p.id !== id)
-      setProducts(updated)
+      const allProducts = JSON.parse(localStorage.getItem('admin_products') || '[]')
+      const updated = allProducts.filter((p: Product) => p.id !== id)
       localStorage.setItem('admin_products', JSON.stringify(updated))
+      syncToFrontend(updated)
+      loadProducts()
       toast({ title: 'Product deleted successfully' })
     }
+  }
+
+  const toggleOutOfStock = (product: Product) => {
+    const allProducts = JSON.parse(localStorage.getItem('admin_products') || '[]')
+    const updated = allProducts.map((p: Product) => 
+      p.id === product.id 
+        ? { ...p, stock: p.stock === 0 ? 1 : 0 }
+        : p
+    )
+    localStorage.setItem('admin_products', JSON.stringify(updated))
+    syncToFrontend(updated)
+    loadProducts()
+    toast({ title: product.stock === 0 ? 'Product marked in stock' : 'Product marked out of stock' })
   }
 
   const resetForm = () => {
     setFormData({
       name: '',
       priceNum: 0,
-      category: '',
       brand: '',
       size: '',
       image: '',
@@ -226,9 +208,7 @@ export default function ProductsPage() {
       waterResistance: '',
       warranty: '',
       stock: 0,
-      sku: '',
-      categoryId: '',
-      brandId: ''
+      sku: ''
     })
     setEditingProduct(null)
     setIsDialogOpen(false)
@@ -238,24 +218,24 @@ export default function ProductsPage() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Products</h1>
-          <p className="text-muted-foreground">{filteredProducts.length} products in inventory</p>
+          <h1 className="text-3xl font-bold mb-2">Men's Watches</h1>
+          <p className="text-muted-foreground">{filteredProducts.length} products</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => { resetForm(); setIsDialogOpen(true); }}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Product
+              Add Watch
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+              <DialogTitle>{editingProduct ? 'Edit Watch' : 'Add New Men\'s Watch'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <Label htmlFor="name">Product Name *</Label>
+                  <Label htmlFor="name">Watch Name *</Label>
                   <Input
                     id="name"
                     value={formData.name}
@@ -280,21 +260,6 @@ export default function ProductsPage() {
                     onChange={(e) => setFormData({ ...formData, priceNum: Number(e.target.value) })}
                     required
                   />
-                </div>
-                <div>
-                  <Label htmlFor="category">Category *</Label>
-                  <select
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full p-2 border rounded-md"
-                    required
-                  >
-                    <option value="">Select category</option>
-                    {categories.map(cat => (
-                      <option key={cat.id} value={cat.name}>{cat.name}</option>
-                    ))}
-                  </select>
                 </div>
                 <div>
                   <Label htmlFor="brand">Brand</Label>
@@ -329,6 +294,14 @@ export default function ProductsPage() {
                     placeholder="e.g., 42mm"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="material">Material</Label>
+                  <Input
+                    id="material"
+                    value={formData.material}
+                    onChange={(e) => setFormData({ ...formData, material: e.target.value })}
+                  />
+                </div>
                 <div className="col-span-2">
                   <Label htmlFor="image">Image URL *</Label>
                   <Input
@@ -355,15 +328,6 @@ export default function ProductsPage() {
                     value={formData.features}
                     onChange={(e) => setFormData({ ...formData, features: e.target.value })}
                     rows={4}
-                    placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="material">Material</Label>
-                  <Input
-                    id="material"
-                    value={formData.material}
-                    onChange={(e) => setFormData({ ...formData, material: e.target.value })}
                   />
                 </div>
                 <div>
@@ -374,7 +338,7 @@ export default function ProductsPage() {
                     onChange={(e) => setFormData({ ...formData, waterResistance: e.target.value })}
                   />
                 </div>
-                <div className="col-span-2">
+                <div>
                   <Label htmlFor="warranty">Warranty</Label>
                   <Input
                     id="warranty"
@@ -394,29 +358,15 @@ export default function ProductsPage() {
 
       {/* Filters */}
       <Card className="p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          <div>
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value="">All Categories</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.name}>{cat.name}</option>
-              ))}
-            </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search men's watches..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
           <div>
             <select
@@ -433,21 +383,29 @@ export default function ProductsPage() {
         </div>
       </Card>
 
-      {/* Products Grid */}
-      <div className="space-y-3">
-        {filteredProducts.map(product => (
-          <Card key={product.id} className="overflow-hidden">
-            <div className="flex gap-4 p-4">
-              <div className="relative w-24 h-24 flex-shrink-0 bg-muted rounded-lg overflow-hidden">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
-                {product.stock < 5 && (
-                  <div className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                    Low
+      {/* Products List */}
+      {isLoading ? (
+        <Card className="p-12 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            <p className="text-muted-foreground">Loading men's watches...</p>
+          </div>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {filteredProducts.map(product => (
+            <Card key={product.id} className="overflow-hidden">
+              <div className="flex gap-4 p-4">
+                <div className="relative w-24 h-24 flex-shrink-0 bg-muted rounded-lg overflow-hidden">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
+                  {product.stock === 0 && (
+                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">OUT OF STOCK</span>
                   </div>
                 )}
               </div>
@@ -459,18 +417,34 @@ export default function ProductsPage() {
                   </div>
                   <div className="text-right ml-4">
                     <p className="font-bold text-lg">{product.price}</p>
+                    {product.stock === 0 ? (
+                      <Badge variant="destructive" className="mt-1">Out of Stock</Badge>
+                    ) : product.stock < 5 ? (
+                      <Badge variant="secondary" className="mt-1 bg-orange-100 text-orange-800">Low Stock</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="mt-1 bg-green-100 text-green-800">In Stock</Badge>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-4 text-sm text-muted-foreground mb-3">
                   <span>SKU: {product.sku || 'N/A'}</span>
-                  <span>Category: {product.category}</span>
-                  <span>Stock: <span className={product.stock < 5 ? 'text-red-600 font-semibold' : ''}>{product.stock}</span></span>
+                  <span>Stock: {product.stock}</span>
                   {product.size && <span>Size: {product.size}</span>}
+                  {product.material && <span>Material: {product.material}</span>}
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>
                     <Edit className="h-4 w-4 mr-1" />
                     Edit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => toggleOutOfStock(product)}
+                    className={product.stock === 0 ? 'border-green-600 text-green-600' : 'border-red-600 text-red-600'}
+                  >
+                    <AlertCircle className="h-4 w-4 mr-1" />
+                    {product.stock === 0 ? 'Mark In Stock' : 'Mark Out of Stock'}
                   </Button>
                   <Button variant="outline" size="sm" onClick={() => handleDelete(product.id)}>
                     <Trash2 className="h-4 w-4 mr-1" />
@@ -481,14 +455,13 @@ export default function ProductsPage() {
             </div>
           </Card>
         ))}
+        {filteredProducts.length === 0 && (
+          <Card className="p-12 text-center">
+            <h3 className="text-lg font-semibold mb-2">No men's watches found</h3>
+            <p className="text-muted-foreground">Try adjusting your filters or add new products</p>
+          </Card>
+        )}
       </div>
-
-      {filteredProducts.length === 0 && (
-        <Card className="p-12 text-center">
-          <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No products found</h3>
-          <p className="text-muted-foreground">Try adjusting your filters or add a new product</p>
-        </Card>
       )}
     </div>
   )
