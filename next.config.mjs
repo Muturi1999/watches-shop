@@ -41,6 +41,12 @@ const nextConfig = {
       //   hostname: 'api.yourbackend.com',
       // },
     ],
+    localPatterns: [
+      {
+        pathname: '/**',
+        search: '',
+      },
+    ],
   },
 };
 

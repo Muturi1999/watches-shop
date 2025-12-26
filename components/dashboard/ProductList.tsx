@@ -253,8 +253,8 @@ export default function ProductList({ initialProducts, filterCategory }: { initi
                   <input className="input" value={(editForm.brand as string) || ''} onChange={(e) => setField('brand', e.target.value as any)} placeholder="Brand" />
                 </div>
                 <input className="input" value={(editForm.subcategory as string) || ''} onChange={(e) => setField('subcategory', e.target.value as any)} placeholder="Subcategory" />
-                <input className="input" value={Array.isArray(editForm.tags) ? (editForm.tags as string[]).join(', ') : (editForm.tags as string) || ''} onChange={(e) => setField('tags', e.target.value as any)} placeholder="Tags (comma separated)" />
-                <input className="input" value={Array.isArray(editForm.badges) ? (editForm.badges as string[]).join(', ') : (editForm.badges as string) || ''} onChange={(e) => setField('badges', e.target.value as any)} placeholder="Badges (comma separated)" />
+                <input className="input" value={Array.isArray(editForm.tags) ? (editForm.tags as string[]).join(', ') : ((editForm.tags as string | undefined) || '')} onChange={(e) => setField('tags', e.target.value as any)} placeholder="Tags (comma separated)" />
+                <input className="input" value={Array.isArray(editForm.badges) ? (editForm.badges as string[]).join(', ') : ((editForm.badges as string | undefined) || '')} onChange={(e) => setField('badges', e.target.value as any)} placeholder="Badges (comma separated)" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <input className="input" value={(editForm.inventory?.stock as any) ?? ''} onChange={(e) => setField('inventory', { ...(editForm.inventory || {}), stock: Number(e.target.value) } as any)} placeholder="Inventory stock" />
                   <input className="input" value={(editForm.inventory?.sku as string) || ''} onChange={(e) => setField('inventory', { ...(editForm.inventory || {}), sku: e.target.value } as any)} placeholder="Inventory SKU" />

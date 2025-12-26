@@ -116,7 +116,7 @@ export default function ProductsPage() {
       setBrands(JSON.parse(stored))
     } else {
       // Extract unique brands from products
-      const productBrands = products.map(p => p.brand).filter(Boolean)
+      const productBrands = products.map(p => p.brand).filter(Boolean) as string[]
       const uniqueBrands = [...new Set(productBrands)].map((brand, index) => ({
         id: index + 1,
         name: brand,
